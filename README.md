@@ -1,90 +1,55 @@
-# sse4-mandelbrot
-Mandelbrot speed updates over SIMD versions
+# Mandelbrot speed updates over SIMD versions
 
 
 =================================================================================
-  Mandelbrot fractal generator --- SSE2, SSE4.1, AVX2 and AVX512 implementations
+  Mandelbrot fractal generator --- SSE2, SSE4, AVX2 and AVX512 implementations
 =================================================================================
 
-SSE procedure calculates 4 pixels in parallel. SSE4.1 procedure uses
-``PTEST`` instruction to break loop when lengths of all 4 complex numbers
-are greater then some threshold.  SSE2 version uses ``PMOVMSKB`` and x86
-``TEST``. Both AVX2 & AVX512 procedures are a translation of the SSE4.1
-version.
+This project is taken from https://github.com/WojciechMula/toys/tree/master/sse4-mandelbrot
+All credits and rights remain to the original author. 
 
-Average speedup over FPU procedure is around 4.5 times --- see below.
+the original author mentions:
 
+> Average speedup over FPU procedure is around 4.5 times
 
-Compilation
-------------------------------------------------------------------------
+This is not quite true, speedup is much, much, much larger for the following reasons
 
-Simply type ``make``. Following programs will be compiled:
+- default compilation use "-march=native", which creates very very different code already leveraging SIMD floating point instructions when float/double types are used. e.g. SSE4 implementations must be compiled with AVX,AVX2,AVX256 explicitly disabled.
 
-* ``fractal32sse2``    --- 32-bit SSE2 procedure + scalar version using default GCC
-  settings (probably scalar SSE instructions)
-* ``fractal32sse4``    --- 32-bit SSE4.1 procedure + scalar version as above
-* ``fractal64sse4``    --- 64-bit SSE4.1 procedure + scalar version as above
-* ``fractal64avx2``    --- 64-bit AVX2 procedure + SSE4.1 + scalar version
-* ``fractal32sse2fpu`` --- 32-bit SSE2 procedure + scalar version using FPU
-* ``fractal32sse4fpu`` --- 32-bit SSE2 procedure + scalar version using FPU
-* ``fractal64sse4fpu`` --- 64-bit SSE4.1 procedure + scalar version using FPU
-* ``fractal64avx512f`` --- AVX512F and AVX2, SSE4.1 and FPU versions
+- original code is not the most efficient, there are simple C simplifications which makes it already faster. Taking care of trivial pipelining is quite important. GCC is able to unroll code when loop invariants do not overlab with start and end conditions. 
 
-To run ``fractal64avx512*`` you need `Intel Software Development Emulator`__.
+- fine grain tuning can be made with Intel IACA, which exposes execution latencies and bottlenecks
+https://software.intel.com/en-us/articles/intel-architecture-code-analyzer
+Latencies and troghput computed friom this tool show the differences between latencies and throughput, and the potential gain that code stitching would help to achieve.
 
-__ https://software.intel.com/en-us/articles/intel-software-development-emulator
+- some procesors (https://software.intel.com/en-us/forums/intel-isa-extensions/topic/737959 and https://ark.intel.com)do have 2 fma (fused multiply and add) units, this nearly helps to  double the throughput, since fma instructions are the bottleneck
+
+- code scales with openMP (as do most of mandelbrot implementation, the problem to solve is a paradigm of parallelism)
 
 
-Results for 32-bit versions
-------------------------------------------------------------------------
+**Measured speed-up is much larger than 80.**
 
-"FPU" procedure uses FPU instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Measurements
 
-+----------------------------------+----------------+-------------+-------------+
-| CPU                              | FPU [us]       | SSE4.1 [us] | speedup [%] |
-+==================================+================+=============+=============+
-| Core2 Duo E8200 @ 2.66GHz        | ?              | ?           | 450         |
-+----------------------------------+----------------+-------------+-------------+
-| Core i7-3612QM CPU @ 2.10GHz     | 530472         | 152459      | 348         |
-+----------------------------------+----------------+-------------+-------------+
-| Core2 Duo E8200 @ 2.66GHz        | 1716500        | 250706      | 685         |
-+----------------------------------+----------------+-------------+-------------+
+The following has been taken on a "Intel(R) Core(TM) i7-8650U" processor using the "make run" command.
 
-
-"FPU" procedure uses scalar SSE instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-+----------------------------------+----------------+-------------+-------------+
-| CPU                              | FPU [us]       | SSE4.1 [us] | speedup [%] |
-+==================================+================+=============+=============+
-| Core i7-3612QM CPU @ 2.10GHz     | 488984         | 152459      | 320         |
-+----------------------------------+----------------+-------------+-------------+
+<tt>
+                                                   time (secs)
+Original C code (ORIG) ................... :       164
+Simplified C code (FPU) .................. :       137
+SSE4 code (SSE4) ......................... :        26.0
+AVX2 code (AVX2) ......................... :        10.3
+AVX2,FMA code (AVX2+FMA) ................. :         9.45
+AVX2,FMA code (AVX2+FMA+STITCH) .......... :         4.93
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.73     (2 different cores)
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.00     (4 hyperthreads on 2 different cores)
+AVX512,FMA,OPENMP with 2 FMA units ....... :         1.20     (estimated)
+</tt>
 
 
-Results for 64-bit versions
-------------------------------------------------------------------------
 
 
-"FPU" procedure uses FPU instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-+----------------------------------+---------------+---------------+---------------+
-| CPU                              | FPU [us]      | SSE4.1 [us]   | AVX2 [us]     |
-+==================================+===============+===============+===============+
-| Core i5 M540 CPU @ 2.35GHz       | 904228        | 143635 (6.3x) |               |
-+----------------------------------+---------------+---------------+---------------+
-| Skylake i7-6700 CPU @ 3.40GHz    | 685141        | 119640 (5.7x) | 61883 (1.9x)  |
-+----------------------------------+---------------+---------------+---------------+
 
-"FPU" procedure uses scalar SSE instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-+----------------------------------+---------------+---------------+---------------+
-| CPU                              | FPU [us]      | SSE4.1 [us]   | AVX2 [us]     |
-+==================================+===============+===============+===============+
-| Core i5 M540 CPU @ 2.35GHz       | 542305        | 142498 (3.8x) |               |
-+----------------------------------+---------------+---------------+---------------+
-| Skylake i7-6700 CPU @ 3.40GHz    | 424202        | 114512 (3.7x) | 61876 (1.8x)  |
-+----------------------------------+---------------+---------------+---------------+
+ 
 
