@@ -31,17 +31,19 @@ Latencies and troghput computed friom this tool show the differences between lat
 - code scales with openMP (as do most of mandelbrot implementation, the problem to solve is a paradigm of parallelism) but scales even over hyperthreads, which shows the internal execution ports in the CPU are not saturated by 1 hyperthread.
 
 
-**Measured speed-up is much larger than 80.**
+**In fact Measured speed-up is much larger than 80.**
 
-# Compile and Run
+# Updated measurements
+
+## Compile and Run
 
 ```
 make run
 ```
 
-# Measurements
+## Execution time
 
-The following has been taken on a "Intel(R) Core(TM) i7-8650U" processor
+The following execution times are taken on an "Intel(R) i7-8650U" processor for the same part of the mandelbrot set.
 
 ```
                                                    time (secs)
@@ -56,11 +58,4 @@ AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.00     (4 hyperthreads on
 AVX512,FMA,OPENMP with 2 FMA units ....... :         1.20     (estimated)
 ```
 
-
-
-
-
-
-
- 
 
