@@ -52,6 +52,19 @@ This is not quite true, speedup is much, much, much larger for the following rea
 
 # Updated measurements
 
+## SW updates
+
+Heavily modified by Pierre, 20-05-2018
+
+```
+SSE4 computes 4 pixels in parallel
+AVX2 computes 8 pixels in parallel
+AVX512 computes 16 pixels in parallel
+STITCH stitched code computes 2 strands of 16 pixels in parallel
+OPENMP execution on hyperthreads computes 4 strands of 16 pixels 
+   in parallel on the same core, openmp scales on multiple cores
+```
+
 ## Compile and Run
 
 ```
