@@ -1,14 +1,18 @@
 # Mandelbrot speed updates over SIMD versions
 
-
-=================================================================================
-  Mandelbrot fractal generator --- SSE2, SSE4, AVX2 and AVX512 implementations
-=================================================================================
+## Original project
 
 This project is taken from https://github.com/WojciechMula/toys/tree/master/sse4-mandelbrot
+
+```
+Mandelbrot fractal generator --- SSE2, SSE4, AVX2 and AVX512 implementations
+```
+
 All credits and rights remain to the original author. 
 
-the original author mentions:
+## Speed-up
+
+The original author mentions:
 
 > Average speedup over FPU procedure is around 4.5 times
 
@@ -24,16 +28,22 @@ Latencies and troghput computed friom this tool show the differences between lat
 
 - some procesors (https://software.intel.com/en-us/forums/intel-isa-extensions/topic/737959 and https://ark.intel.com)do have 2 fma (fused multiply and add) units, this nearly helps to  double the throughput, since fma instructions are the bottleneck
 
-- code scales with openMP (as do most of mandelbrot implementation, the problem to solve is a paradigm of parallelism)
+- code scales with openMP (as do most of mandelbrot implementation, the problem to solve is a paradigm of parallelism) but scales even over hyperthreads, which shows the internal execution ports in the CPU are not saturated by 1 hyperthread.
 
 
 **Measured speed-up is much larger than 80.**
 
+# Compile and Run
+
+```
+make run
+```
+
 # Measurements
 
-The following has been taken on a "Intel(R) Core(TM) i7-8650U" processor using the "make run" command.
+The following has been taken on a "Intel(R) Core(TM) i7-8650U" processor
 
-<tt>
+```
                                                    time (secs)
 Original C code (ORIG) ................... :       164
 Simplified C code (FPU) .................. :       137
@@ -44,7 +54,8 @@ AVX2,FMA code (AVX2+FMA+STITCH) .......... :         4.93
 AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.73     (2 different cores)
 AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.00     (4 hyperthreads on 2 different cores)
 AVX512,FMA,OPENMP with 2 FMA units ....... :         1.20     (estimated)
-</tt>
+```
+
 
 
 
