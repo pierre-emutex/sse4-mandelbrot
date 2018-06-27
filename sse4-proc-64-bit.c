@@ -3,12 +3,12 @@
 
 void
 SSE_mandelbrot(float Re_min, float Re_max,
-               float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+               float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     int x, y, i;
 
-    uint32_t *ptr = (uint32_t *) data;
+    uint64_t *ptr = (uint64_t *) data;
 
     // step on Re and Im axis
     dRe = (Re_max - Re_min) / width;
@@ -55,10 +55,8 @@ SSE_mandelbrot(float Re_min, float Re_max,
                 Xrm = _mm_mul_ps(Xre, Xim);
             }
 
-            __m128i t1 = _mm_packus_epi16(itercount, itercount);
-            __m128i t2 = _mm_packus_epi16(t1, t1);
-
-            *ptr++ = _mm_cvtsi128_si32(t2);
+            __m128i t1 = _mm_packus_epi32(itercount, itercount);
+            *ptr++ = _mm_cvtsi128_si64(t1);
 
             // advance Cre vector
             Cre = _mm_add_ps(Cre, vec_dRe);

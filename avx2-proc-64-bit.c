@@ -3,7 +3,7 @@
 
 void
 AVX2_mandelbrot(float Re_min, float Re_max,
-                float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+                float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     int x, y, i;
@@ -58,18 +58,17 @@ AVX2_mandelbrot(float Re_min, float Re_max,
                 Xrm = _mm256_mul_ps(Xre, Xim);
             }
 
-            itershuffle = _mm256_setr_epi8(0, 4, 8, 12,
+            itershuffle = _mm256_setr_epi8(0, 1, 4, 5, 8, 9, 12, 13,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                           0, 4, 8, 12,
+                                           16, 17, 20, 21, 24, 25, 28, 29,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff);
 
             itercount = _mm256_shuffle_epi8(itercount, itershuffle);
 
-            *ptr++ = _mm256_extract_epi64(itercount, 0) | _mm256_extract_epi64(itercount, 2);
+            *ptr++ = _mm256_extract_epi64(itercount, 0);
+            *ptr++ = _mm256_extract_epi64(itercount, 2);
 
             // advance Cre vector
             Cre = _mm256_add_ps(Cre, vec_dRe);
@@ -86,7 +85,7 @@ AVX2_mandelbrot(float Re_min, float Re_max,
 
 void
 AVX2_FMA_mandelbrot(float Re_min, float Re_max,
-                    float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+                    float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     int x, y, i, j;
@@ -177,18 +176,17 @@ AVX2_FMA_mandelbrot(float Re_min, float Re_max,
                 }
             }
 
-            itershuffle = _mm256_setr_epi8(0, 4, 8, 12,
+            itershuffle = _mm256_setr_epi8(0, 1, 4, 5, 8, 9, 12, 13,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                           0, 4, 8, 12,
+                                           16, 17, 20, 21, 24, 25, 28, 29,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
                                            (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff);
 
             itercount = _mm256_shuffle_epi8(itercount, itershuffle);
 
-            *ptr++ = _mm256_extract_epi64(itercount, 0) | _mm256_extract_epi64(itercount, 2);
+            *ptr++ = _mm256_extract_epi64(itercount, 0);
+            *ptr++ = _mm256_extract_epi64(itercount, 2);
 
             // advance Cre vector
             Cre = _mm256_add_ps(Cre, vec_dRe);
@@ -201,7 +199,7 @@ AVX2_FMA_mandelbrot(float Re_min, float Re_max,
 
 void
 AVX2_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
-                           float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+                           float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     int x, y, i, j;
@@ -236,7 +234,7 @@ AVX2_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
                                     4 * dRe, 5 * dRe, 6 * dRe, 7 * dRe);
 
         uint64_t *ptr0 = (uint64_t *) (data + y * width);
-        uint64_t *ptr1 = ptr0 + width / 8;
+        uint64_t *ptr1 = (uint64_t *) (data + y * width + width);
 
         __m256 Cre = _mm256_set1_ps(Re_min);
 
@@ -333,20 +331,20 @@ AVX2_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
 
             }
 
-            __m256i itershuffle = _mm256_setr_epi8(0, 4, 8, 12,
-                                                   (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                                   (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                                   (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                                   (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                                   0, 4, 8, 12,
-                                                   (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
-                                                   (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff);
+            __m256i itershuffle = _mm256_setr_epi8(0, 1, 4, 5, 8, 9, 12, 13,
+                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
+                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
+                                           16, 17, 20, 21, 24, 25, 28, 29,
+                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff,
+                                           (char) 0xff, (char) 0xff, (char) 0xff, (char) 0xff);
 
             itercount0 = _mm256_shuffle_epi8(itercount0, itershuffle);
             itercount1 = _mm256_shuffle_epi8(itercount1, itershuffle);
 
-            *ptr0++ = _mm256_extract_epi64(itercount0, 0) | _mm256_extract_epi64(itercount0, 2);
-            *ptr1++ = _mm256_extract_epi64(itercount1, 0) | _mm256_extract_epi64(itercount1, 2);
+            *ptr0++ = _mm256_extract_epi64(itercount0, 0);
+            *ptr0++ = _mm256_extract_epi64(itercount0, 2);
+            *ptr1++ = _mm256_extract_epi64(itercount1, 0);
+            *ptr1++ = _mm256_extract_epi64(itercount1, 2);
 
             // advance Cre vector
             Cre = _mm256_add_ps(Cre, vec_dRe);

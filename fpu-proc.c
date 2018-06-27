@@ -1,13 +1,13 @@
 //=== C reference implementation =========================================
 void
 ORIG_mandelbrot(float Re_min, float Re_max,
-                float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+                float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     float Cre, Cim, Xre, Xim, Tre, Tim;
     int x, y, i;
 
-    uint8_t *ptr = data;
+    uint16_t *ptr = data;
 
     // step on Re and Im axis
     dRe = (Re_max - Re_min) / width;
@@ -41,13 +41,13 @@ ORIG_mandelbrot(float Re_min, float Re_max,
 
 void
 FPU_mandelbrot(float Re_min, float Re_max,
-               float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+               float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     float Cre, Cim, Xre, Xim, Xrm;
     int x, y, i;
 
-    uint8_t *ptr = data;
+    uint16_t *ptr = data;
 
     // step on Re and Im axis
     dRe = (Re_max - Re_min) / width;

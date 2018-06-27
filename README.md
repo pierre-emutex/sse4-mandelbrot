@@ -61,22 +61,24 @@ SSE4 computes 4 pixels in parallel
 AVX2 computes 8 pixels in parallel
 AVX512 computes 16 pixels in parallel
 STITCH stitched code computes 2 strands of 16 pixels in parallel
-OPENMP execution on hyperthreads computes 4 strands of 16 pixels 
-   in parallel on the same core, openmp scales on multiple cores
+OPENMP execution on hyperthreads computes 4 strands of 16 pixels in parallel on the same core
+
+Improve grey and color rendering, and images can be compared and verified
 ```
 
 ## Compile and Run
 
 ```
-make run
+make example
 ```
 
 ## Results : execution time
 
 The following execution times are taken on an "Intel(R) i7-8650U" processor for the same part of the mandelbrot set.
 
+### gcc 7.3 time (secs)
+
 ```
-                                                   time (secs)
 Original C code (ORIG) ................... :       164.
 Simplified C code (FPU) .................. :       137.
 SSE4 code (SSE4) ......................... :        26.0
@@ -88,4 +90,17 @@ AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.00     (4 hyperthreads on
 AVX512,FMA,OPENMP with 2 FMA units ....... :         1.20     (estimated)
 ```
 
+### clang 6.1 time (secs)
+
+```
+Original C code (ORIG) ................... :       148.
+Simplified C code (FPU) .................. :       137.
+SSE4 code (SSE4) ......................... :        31.3
+AVX2 code (AVX2) ......................... :        17.2
+AVX2,FMA code (AVX2+FMA) ................. :        11.4
+AVX2,FMA code (AVX2+FMA+STITCH) .......... :         3.89
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         --- 
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         --- 
+AVX512,FMA,OPENMP with 2 FMA units ....... :         --- 
+```
 

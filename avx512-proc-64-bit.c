@@ -4,12 +4,12 @@
 
 void
 AVX512_mandelbrot(float Re_min, float Re_max,
-                  float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+                  float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     int x, y, i;
 
-    __m128i *ptr = (__m128i *) data;
+    __m256i *ptr = (__m256i *) data;
 
     _mm256_zeroall();
 
@@ -61,7 +61,7 @@ AVX512_mandelbrot(float Re_min, float Re_max,
                 Xrm = _mm512_mul_ps(Xre, Xim);
             }
 
-            *ptr++ = _mm512_cvtepi32_epi8(itercount);
+            *ptr++ = _mm512_cvtepi32_epi16(itercount);
 
             // advance Cre vector
             Cre = _mm512_add_ps(Cre, vec_dRe);
@@ -78,12 +78,12 @@ AVX512_mandelbrot(float Re_min, float Re_max,
 
 void
 AVX512_FMA_mandelbrot(float Re_min, float Re_max, float Im_min, float Im_max, float threshold, int maxiters, int width,
-                      int height, uint8_t * data)
+                      int height, uint16_t * data)
 {
     float dRe, dIm;
     int x, y, i, j;
 
-    __m128i *ptr = (__m128i *) data;
+    __m256i *ptr = (__m256i *) data;
     int miniters = maxiters & ~7;
 
     // step on Re and Im axis
@@ -169,7 +169,7 @@ AVX512_FMA_mandelbrot(float Re_min, float Re_max, float Im_min, float Im_max, fl
                 }
             }
 
-            *ptr++ = _mm512_cvtepi32_epi8(itercount);
+            *ptr++ = _mm512_cvtepi32_epi16(itercount);
 
             // advance Cre vector
             Cre = _mm512_add_ps(Cre, vec_dRe);
@@ -182,12 +182,12 @@ AVX512_FMA_mandelbrot(float Re_min, float Re_max, float Im_min, float Im_max, fl
 
 void
 AVX512_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
-                             float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint8_t * data)
+                             float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
     int x, y, i, j;
 
-    __m128i *ptr = (__m128i *) data;
+    __m256i *ptr = (__m256i *) data;
     int miniters = maxiters & ~7;
 
     _mm256_zeroall();
@@ -215,8 +215,8 @@ AVX512_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
         __m512 Xtt = _mm512_setr_ps(0 * dRe, 1 * dRe, 2 * dRe, 3 * dRe, 4 * dRe, 5 * dRe, 6 * dRe, 7 * dRe,
                                     8 * dRe, 9 * dRe, 10 * dRe, 11 * dRe, 12 * dRe, 13 * dRe, 14 * dRe, 15 * dRe);
 
-        __m128i *ptr0 = ptr + y * width / 16;
-        __m128i *ptr1 = ptr0 + width / 16;
+        __m256i *ptr0 = ptr + y * width / 32;
+        __m256i *ptr1 = ptr0 + width / 32;
 
         __m512 Cre = _mm512_set1_ps(Re_min);
 
@@ -313,8 +313,8 @@ AVX512_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
 
             }
 
-            *ptr0++ = _mm512_cvtepi32_epi8(itercount0);
-            *ptr1++ = _mm512_cvtepi32_epi8(itercount1);
+            *ptr0++ = _mm512_cvtepi32_epi16(itercount0);
+            *ptr1++ = _mm512_cvtepi32_epi16(itercount1);
 
             // advance Cre vector
             Cre = _mm512_add_ps(Cre, vec_dRe);
