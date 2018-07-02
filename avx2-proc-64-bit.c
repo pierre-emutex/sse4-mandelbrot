@@ -202,7 +202,7 @@ AVX2_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
                            float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
-    int x, y, i, j;
+    int y;
 
     int miniters = maxiters & ~7;
 
@@ -232,7 +232,7 @@ AVX2_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
 
         __m256 Xtt = _mm256_setr_ps(0 * dRe, 1 * dRe, 2 * dRe, 3 * dRe,
                                     4 * dRe, 5 * dRe, 6 * dRe, 7 * dRe);
-
+	int x, i, j;
         uint64_t *ptr0 = (uint64_t *) (data + y * width);
         uint64_t *ptr1 = (uint64_t *) (data + y * width + width);
 

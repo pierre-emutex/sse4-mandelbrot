@@ -1,6 +1,7 @@
 
 FLAGS=-Wall -Wextra -pedantic -O3 -fomit-frame-pointer -fexpensive-optimizations -fno-stack-protector -ffast-math
-COMPILER=clang
+
+# COMPILER=clang
 COMPILER=gcc
 
 MAIN=main.c
@@ -41,15 +42,27 @@ fractal64avx512fma: $(DEPS) avx2-proc-64-bit.c avx512-proc-64-bit.c
 fractal64avx512fmaopenmp: $(DEPS) avx2-proc-64-bit.c avx512-proc-64-bit.c
 	$(COMPILER) $(FLAGS) -fopenmp -mfma -mavx2 -mavx512f -DSSE4 -DAVX2 -DFMA -DAVX512 -march=knl $(MAIN) -o $@
 
+# -----------------------------------------------------------------------------------------
+# Nice little example
+#
+# Coordinates from
 # https://software.intel.com/en-us/articles/introduction-to-intel-advanced-vector-extensions
+#
+# -----------------------------------------------------------------------------------------
+
 EXAMPLE_PARAM=-w 4096 -h 4096 -xmin 0.29768 -xmax 0.29778 -ymin 0.48354 -ymax 0.48364 -t 4.0 -i 400
 
 example: fractal64avx2fmaopenmp
 	 taskset -c 2,3,6,7 ./fractal64avx2fmaopenmp -p AVX2+FMA+STITCH $(EXAMPLE_PARAM) -pgm -xpm
 
+# -----------------------------------------------------------------------------------------
+# Benchmark
+# -----------------------------------------------------------------------------------------
+
 RUN_PARAM=-w 8192 -h 8192 -xmin -1 -ymin -1 -xmax 1 -ymax 1 -t 4.0 -i 1024
 
 run: $(ALL)
+	$(COMPILER) --version
 	 ./fractal64fpu -p ORIG $(RUN_PARAM)
 	 ./fractal64fpu -p FPU $(RUN_PARAM)
 	 ./fractal64sse4 -p SSE $(RUN_PARAM)

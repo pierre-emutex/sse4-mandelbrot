@@ -90,17 +90,31 @@ AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.00     (4 hyperthreads on
 AVX512,FMA,OPENMP with 2 FMA units ....... :         1.20     (estimated)
 ```
 
-### clang 6.1 time (secs)
+### gcc 7.3 time (secs)
+
+```
+Original C code (ORIG) ................... :       164.
+Simplified C code (FPU) .................. :       137.
+SSE4 code (SSE4) ......................... :        26.0
+AVX2 code (AVX2) ......................... :        10.3
+AVX2,FMA code (AVX2+FMA) ................. :         9.45
+AVX2,FMA code (AVX2+FMA+STITCH) .......... :         4.93
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.73     (2 different cores)
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.00     (4 hyperthreads on 2 different cores)
+AVX512,FMA,OPENMP with 2 FMA units ....... :         1.20     (estimated)
+```
+
+### clang 6.0.1 time (secs)
 
 ```
 Original C code (ORIG) ................... :       148.
-Simplified C code (FPU) .................. :       137.
-SSE4 code (SSE4) ......................... :        31.3
-AVX2 code (AVX2) ......................... :        17.2
-AVX2,FMA code (AVX2+FMA) ................. :        11.4
-AVX2,FMA code (AVX2+FMA+STITCH) .......... :         3.89
-AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         --- 
-AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         --- 
+Simplified C code (FPU) .................. :        90.9
+SSE4 code (SSE4) ......................... :        20.5
+AVX2 code (AVX2) ......................... :        10.6
+AVX2,FMA code (AVX2+FMA) ................. :         6.93
+AVX2,FMA code (AVX2+FMA+STITCH) .......... :         3.78
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         2.27
+AVX2,FMA,OPENMP code (AVX2+FMA+STITCH) ... :         1.95 
 AVX512,FMA,OPENMP with 2 FMA units ....... :         --- 
 ```
 

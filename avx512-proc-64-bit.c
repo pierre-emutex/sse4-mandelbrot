@@ -185,7 +185,7 @@ AVX512_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
                              float Im_min, float Im_max, float threshold, int maxiters, int width, int height, uint16_t * data)
 {
     float dRe, dIm;
-    int x, y, i, j;
+    int y;
 
     __m256i *ptr = (__m256i *) data;
     int miniters = maxiters & ~7;
@@ -214,7 +214,7 @@ AVX512_FMA_STITCH_mandelbrot(float Re_min, float Re_max,
         __m512 Cim1 = _mm512_add_ps(Cim0, _mm512_set1_ps(dIm));
         __m512 Xtt = _mm512_setr_ps(0 * dRe, 1 * dRe, 2 * dRe, 3 * dRe, 4 * dRe, 5 * dRe, 6 * dRe, 7 * dRe,
                                     8 * dRe, 9 * dRe, 10 * dRe, 11 * dRe, 12 * dRe, 13 * dRe, 14 * dRe, 15 * dRe);
-
+	int x, i, j;
         __m256i *ptr0 = ptr + y * width / 32;
         __m256i *ptr1 = ptr0 + width / 32;
 
